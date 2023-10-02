@@ -1,5 +1,5 @@
 apiVersion: v2
-name: gmsmf
+name: bgmf
 description: A Helm chart for BahamaGames GamemakerStudio micro service multiplayer framework
 
 # A chart can be either an 'application' or a 'library' chart.
