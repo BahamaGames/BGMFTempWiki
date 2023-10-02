@@ -1,0 +1,217 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.gameNodeManager.name }}
+  namespace: {{ .Values.services.namespace }}
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Values.gameNodeManager.name }}
+  namespace: {{ .Values.services.namespace }}
+rules:
+  - apiGroups: [""]
+    resources: ["nodes", "nodes/status", "pods", "pods/status"]
+    verbs: ["*"]
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Values.gameNodeManager.name }}
+  namespace: {{ .Values.services.namespace }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.gameNodeManager.name }}
+  namespace: {{ .Values.services.namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ .Values.gameNodeManager.name }}
+  apiGroup: rbac.authorization.k8s.io
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.gameNodeManager.name }}
+  namespace: {{ .Values.services.namespace }}
+  labels:
+    app: {{ .Values.gameNodeManager.name }}
+  annotations:
+    keel.sh/policy: minor # <-- policy name according to https://semver.org/
+    keel.sh/trigger: poll # <-- actively query registry, otherwise defaults to webhooks
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Values.gameNodeManager.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.gameNodeManager.name }}
+    spec:
+      {{- if eq .Values.env "prod" }}
+      nodeSelector:
+        role: {{ .Values.services.nodeSelector }}
+      {{- end }}
+      serviceAccountName: {{ .Values.gameNodeManager.name }}
+      containers:
+      - name: {{ .Values.gameNodeManager.name }}
+        image: "bahamagames/game-node-manager:{{ .Values.gameNodeManager.version }}"
+        imagePullPolicy: {{ .Values.gameNodeManager.imagePullPolicy }}
+        resources:
+          requests:
+            cpu: {{ .Values.gameNodeManager.resources.requests.cpu }}
+            memory: {{ .Values.gameNodeManager.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.gameNodeManager.resources.limits.cpu }}
+            memory: {{ .Values.gameNodeManager.resources.limits.memory }}
+        env:
+          - name: TICK_RATE
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGSM_TICK_RATE
+                optional: true
+          - name: IDLE_POOL_SIZE
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGSM_IDLE_POOL_SIZE
+                optional: true
+          - name: DGS_POD_FPS
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_FPS
+                optional: true
+          - name: DGS_POD_IMAGE
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_IMAGE
+                optional: true
+          - name: DGS_POD_VERSION
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_VERSION
+                optional: true
+          - name: DGS_POD_TICKRATE
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_TICKRATE
+                optional: true
+          - name: DGS_POD_NAMESPACE
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_NAMESPACE
+                optional: true
+          - name: DGS_POD_SIDECAR_VERSION
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_SIDECAR_VERSION
+                optional: true
+          - name: DGS_POD_SIDECAR_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_SIDECAR_NAME
+                optional: true
+          - name: DGS_POD_SIDECAR_RESOURCES_REQUEST_CPU
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_SIDECAR_RESOURCES_REQUEST_CPU
+                optional: true
+          - name: DGS_POD_SIDECAR_RESOURCES_REQUEST_MEM
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_SIDECAR_RESOURCES_REQUEST_MEM
+                optional: true
+          - name: DGS_POD_SIDECAR_RESOURCES_LIMITS_CPU
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_SIDECAR_RESOURCES_LIMITS_CPU
+                optional: true
+          - name: DGS_POD_SIDECAR_RESOURCES_LIMITS_MEM
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_SIDECAR_RESOURCES_LIMITS_MEM
+                optional: true
+          - name: DGS_POD_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_NAME
+                optional: true
+          - name: DGS_POD_RESOURCES_REQUEST_CPU
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_RESOURCES_REQUEST_CPU
+                optional: true
+          - name: DGS_POD_RESOURCES_REQUEST_MEM
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_RESOURCES_REQUEST_MEM
+                optional: true
+          - name: DGS_POD_RESOURCES_LIMITS_CPU
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_RESOURCES_LIMITS_CPU
+                optional: true
+          - name: DGS_POD_RESOURCES_LIMITS_MEM
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DGS_POD_RESOURCES_LIMITS_MEM
+                optional: true
+
+          - name: REDIS_LOCAL_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  REDIS_LOCAL_HOST
+                optional: true
+          - name: REDIS_LOCAL_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  REDIS_LOCAL_PORT
+                optional: true
+          - name: REDIS_REMOTE_USER_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  REDIS_REMOTE_USER_NAME
+                optional: true
+          - name: REDIS_REMOTE_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  REDIS_REMOTE_PASSWORD
+                optional: true
+          - name: REDIS_REMOTE_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  REDIS_REMOTE_HOST
+                optional: true
+          - name: REDIS_REMOTE_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  REDIS_REMOTE_PORT
+                optional: true

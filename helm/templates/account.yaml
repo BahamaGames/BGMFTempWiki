@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.account.name }}
+  namespace: {{ .Values.services.namespace }}
+  labels:
+    app: {{ .Values.account.name }}
+  annotations:
+    keel.sh/policy: minor # <-- policy name according to https://semver.org/
+    keel.sh/trigger: poll # <-- actively query registry, otherwise defaults to webhooks
+spec:
+  replicas: {{ .Values.account.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.account.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.account.name }}
+    spec:
+      {{- if eq .Values.env "prod" }}
+      nodeSelector:
+        role: {{ .Values.services.nodeSelector }}
+      {{- end }}
+      containers:
+      - name: {{ .Values.account.name }}
+        image: "bahamagames/account:{{ .Values.account.version }}"
+        imagePullPolicy: {{ .Values.account.imagePullPolicy }}
+        resources:
+          requests:
+            cpu: {{ .Values.account.resources.requests.cpu }}
+            memory: {{ .Values.account.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.account.resources.limits.cpu }}
+            memory: {{ .Values.account.resources.limits.memory }}
+        env:
+          - name: ACCESS_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{.Values.services.namespace}}
+                key: ACCESS_SECRET
+                optional: true
+          - name: REDIS_LOCAL_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  REDIS_LOCAL_HOST
+                optional: true
+          - name: REDIS_LOCAL_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  REDIS_LOCAL_PORT
+                optional: true
+          - name: REDIS_REMOTE_USER_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  REDIS_REMOTE_USER_NAME
+                optional: true
+          - name: REDIS_REMOTE_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  REDIS_REMOTE_PASSWORD
+                optional: true
+          - name: REDIS_REMOTE_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  REDIS_REMOTE_HOST
+                optional: true
+          - name: REDIS_REMOTE_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  REDIS_REMOTE_PORT
+                optional: true

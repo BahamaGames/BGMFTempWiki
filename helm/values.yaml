@@ -1,0 +1,121 @@
+env: 'prod'
+
+services:
+  namespace: svc
+  nodeSelector: svc
+
+configMap:
+  data:
+    REDIS_LOCAL_HOST: redis.default.svc.cluster.local
+    REDIS_LOCAL_PORT: 6379
+    REDIS_REMOTE_USER_NAME: 'default'
+    REDIS_REMOTE_HOST: redis.default.svc.cluster.local
+    REDIS_REMOTE_PORT: 6379
+
+    DGSM_TICK_RATE: 15
+    DGSM_IDLE_POOL_SIZE: 1
+
+    DGS_POD_FPS: 15
+    DGS_POD_NAME: server 
+    DGS_POD_IMAGE: 'bahamagames/dgs-server'
+    DGS_POD_VERSION: 'latest'
+    DGS_POD_TICKRATE: 3
+    DGS_POD_NAMESPACE: 'dgs'
+    DGS_POD_RESOURCES_REQUEST_CPU: '170m'
+    DGS_POD_RESOURCES_REQUEST_MEM: '100Mi'
+    DGS_POD_RESOURCES_LIMITS_CPU: '350m'
+    DGS_POD_RESOURCES_LIMITS_MEM: '230Mi'
+    
+    DGS_POD_SIDECAR_NAME: 'sidecar'
+    DGS_POD_SIDECAR_VERSION: 'latest'
+    DGS_POD_SIDECAR_RESOURCES_REQUEST_CPU: '20m'
+    DGS_POD_SIDECAR_RESOURCES_REQUEST_MEM: '30Mi'
+    DGS_POD_SIDECAR_RESOURCES_LIMITS_CPU: '80m'
+    DGS_POD_SIDECAR_RESOURCES_LIMITS_MEM: '60Mi'
+
+secret:
+  data:
+    ACCESS_SECRET: 'c2VjcmV0'
+    REDIS_REMOTE_PASSWORD: 'NnVJZ1dBemNEbTVOUW1TT3g5NTFTOE1UZmk5TWdVcnQ=' #'6uIgWAzcDm5NQmSOx951S8MTfi9MgUrt'
+
+gameNodeManager:
+  name: game-node-manager
+  version: latest
+  imagePullPolicy: Always
+  resources:
+    requests:
+      cpu: '40m'
+      memory: '40Mi'
+    limits:
+      cpu: '150m'
+      memory: '100Mi'
+
+dedicatedGameServer:
+  name: dgs
+  namespace: dgs
+  nodeSelector: dgs
+
+remoteEntryPoint:
+  enabled: false
+  ingress:
+    host: bahamagames.com
+    port: 80
+  name: rep
+  namespace: rep
+  version: latest
+  imagePullPolicy: Always
+  resources:
+    requests:
+      cpu: '120m'
+      memory: '30Mi'
+    limits:
+      cpu: '270m'
+      memory: '80Mi'
+  ports:
+    tcp: 8080
+
+account:
+  name: account
+  replicas: 1
+  version: latest
+  imagePullPolicy: Always
+  resources:
+    requests:
+      cpu: '10m'
+      memory: '30Mi'
+    limits:
+      cpu: '50m'
+      memory: '100Mi'
+
+matchmaker:
+  name: matchmaker
+  replicas: 1
+  version: latest
+  imagePullPolicy: Always
+  resources:
+    requests:
+      cpu: '10m'
+      memory: '30Mi'
+    limits:
+      cpu: '50m'
+      memory: '100Mi'
+
+linuxBuilder:
+  name: gms-lb
+  imagePullPolicy: Always
+  namespace: gms-lb
+
+redis:
+  service:
+    name: redis 
+    port: 6379
+    namespace: default
+
+  local:
+    host: redis.default.svc.cluster.local
+    port: '6379'
+  remote:
+    userName: ""
+    password: ""
+    host: redis.default.svc.cluster.local
+    port: '6379'
