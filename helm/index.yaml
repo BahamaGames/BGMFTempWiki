@@ -3,13 +3,13 @@ entries:
   bgmf:
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2023-10-02T21:28:14.0871012-04:00"
+    created: "2023-10-02T22:14:16.5291307-04:00"
     description: A Helm chart for BahamaGames GamemakerStudio micro service multiplayer
       framework
     digest: 7b5a3a974d4a29e1a2c4b9b88798dce46d81e881f83f29c74fafea7c54beb57e
     name: bgmf
     type: application
     urls:
-    - https://bahamagames.github.io/BGMFTempWiki/bgmf-0.0.1.tgz
+    - https://bahamagames.github.io/BGMFTempWiki/helm/bgmf-0.0.1.tgz
     version: 0.0.1
-generated: "2023-10-02T21:28:14.0810622-04:00"
+generated: "2023-10-02T22:14:16.5103418-04:00"

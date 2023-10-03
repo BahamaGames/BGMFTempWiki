@@ -40,6 +40,18 @@ spec:
                 name: {{.Values.services.namespace}}
                 key: ACCESS_SECRET
                 optional: true
+          - name: HOTBAR_COUNT
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  HOTBAR_COUNT
+                optional: true
+          - name: DEFAULT_PLAYER_LOCATION
+            valueFrom:
+              configMapKeyRef:
+                name: {{.Values.services.namespace}}
+                key:  DEFAULT_PLAYER_LOCATION
+                optional: true
           - name: REDIS_LOCAL_HOST
             valueFrom:
               configMapKeyRef:
