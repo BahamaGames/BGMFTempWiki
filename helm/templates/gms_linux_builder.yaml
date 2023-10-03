@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gms-lb
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ssh-config
+  namespace: gms-lb
+data:
+  SSH_USER: 'rickky'
+  SSH_PASSWORD: "gms-lb"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gms-lb
+  namespace: gms-lb
+  annotations:
+    keel.sh/policy: minor # <-- policy name according to https://semver.org/
+    keel.sh/trigger: poll # <-- actively query registry, otherwise defaults to webhooks
+spec:
+  selector:
+    matchLabels:
+      app: gms-lb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gms-lb
+    spec:
+      {{- if eq .Values.env "prod" }}
+      nodeSelector:
+        role: {{ .Values.services.nodeSelector }}
+      {{- end }}
+      containers:
+      - name: server
+        image: "bahamagames/gms-linux-builder:{{ .Values.linuxBuilder.version }}"
+        ports:
+        - containerPort: 22
+        resources:
+          requests:
+            cpu: '10m'
+            memory: '30Mi'
+          limits:
+            cpu: '50m'
+            memory: '80Mi'
+        env: 
+          - name: SSH_USER
+            valueFrom:
+              configMapKeyRef:
+                name: ssh-config
+                key:  SSH_USER
+                optional: true
+          - name: SSH_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: ssh-config
+                key:  SSH_PASSWORD
+                optional: true
+      
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: gms-lb
+  name: ssh-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 22
+      targetPort: 22
+      protocol: TCP
+  selector:
+    app: gms-lb

@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{.Values.dedicatedGameServer.namespace}}
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name:                                   {{.Values.dedicatedGameServer.namespace}}
+  namespace:                              {{.Values.dedicatedGameServer.namespace}}
+data:             
+  REDIS_LOCAL_HOST:                       {{.Values.configMap.data.REDIS_LOCAL_HOST}}
+  REDIS_LOCAL_PORT:                       '{{.Values.configMap.data.REDIS_LOCAL_PORT}}'
+  REDIS_REMOTE_USER_NAME:                 {{.Values.configMap.data.REDIS_REMOTE_USER_NAME}}
+  REDIS_REMOTE_HOST:                      {{.Values.configMap.data.REDIS_REMOTE_HOST}}
+  REDIS_REMOTE_PORT:                      '{{.Values.configMap.data.REDIS_REMOTE_PORT}}'
+  {{- if eq .Values.env "dev"}}
+  HOST:                                   {{.Values.dedicatedGameServer.HOST}}
+  PORT:                                   '{{.Values.dedicatedGameServer.PORT}}'
+  {{- end}}
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{.Values.dedicatedGameServer.namespace}}
+  namespace: {{.Values.dedicatedGameServer.namespace}}
+data:
+  ACCESS_SECRET: {{.Values.secret.data.ACCESS_SECRET}}
+  REDIS_REMOTE_PASSWORD: {{.Values.secret.data.REDIS_REMOTE_PASSWORD}}
