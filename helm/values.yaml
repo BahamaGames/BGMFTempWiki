@@ -6,11 +6,15 @@ services:
 
 configMap:
   data:
+    SENTRY_DSN: ""
     REDIS_LOCAL_HOST: redis.default.svc.cluster.local
     REDIS_LOCAL_PORT: 6379
     REDIS_REMOTE_USER_NAME: 'default'
     REDIS_REMOTE_HOST: redis.default.svc.cluster.local
     REDIS_REMOTE_PORT: 6379
+
+    HOTBAR_COUNT: 10
+    DEFAULT_PLAYER_LOCATION: "{\"x\": 0, \"y\": 0, \"depth\": 0, \"room\": \"Room1\", \"layer\": \"Instance\"}"
 
     DGSM_TICK_RATE: 15
     DGSM_IDLE_POOL_SIZE: 1
@@ -37,6 +41,7 @@ secret:
   data:
     ACCESS_SECRET: 'c2VjcmV0'
     REDIS_REMOTE_PASSWORD: 'NnVJZ1dBemNEbTVOUW1TT3g5NTFTOE1UZmk5TWdVcnQ='
+
 gameNodeManager:
   name: game-node-manager
   version: latest
@@ -101,6 +106,7 @@ matchmaker:
 
 linuxBuilder:
   name: gms-lb
+  version: latest
   imagePullPolicy: Always
   namespace: gms-lb
 

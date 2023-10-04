@@ -10,12 +10,14 @@ metadata:
   name:                                   {{.Values.services.namespace}}
   namespace:                              {{.Values.services.namespace}}
 data:             
+  SENTRY_DSN:                             {{.Values.configMap.data.SENTRY_DSN}}
   REDIS_LOCAL_HOST:                       {{.Values.configMap.data.REDIS_LOCAL_HOST}}
   REDIS_LOCAL_PORT:                       '{{.Values.configMap.data.REDIS_LOCAL_PORT}}'
   REDIS_REMOTE_USER_NAME:                 {{.Values.configMap.data.REDIS_REMOTE_USER_NAME}}
   REDIS_REMOTE_HOST:                      {{.Values.configMap.data.REDIS_REMOTE_HOST}}
   REDIS_REMOTE_PORT:                      '{{.Values.configMap.data.REDIS_REMOTE_PORT}}'
-  
+  HOTBAR_COUNT:                           '{{.Values.configMap.data.HOTBAR_COUNT}}'
+  DEFAULT_PLAYER_LOCATION:                {{.Values.configMap.data.DEFAULT_PLAYER_LOCATION}}
   DGSM_TICK_RATE:                         '{{.Values.configMap.data.DGSM_TICK_RATE}}'
   DGSM_IDLE_POOL_SIZE:                    '{{.Values.configMap.data.DGSM_IDLE_POOL_SIZE}}'
   DGS_POD_FPS:                            '{{.Values.configMap.data.DGS_POD_FPS}}'

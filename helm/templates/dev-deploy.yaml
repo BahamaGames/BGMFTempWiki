@@ -41,13 +41,13 @@ spec:
         - name: HOST
           valueFrom:
             configMapKeyRef:
-              name: {{.Values.dedicatedGameServer.namespace}}
+              name: {{.Values.dedicatedGameServer.HOST}}
               key:  HOST
               optional: true
         - name: PORT
           valueFrom:
             configMapKeyRef:
-              name: {{.Values.dedicatedGameServer.namespace}}
+              name: "{{.Values.dedicatedGameServer.PORT}}"
               key:  PORT
               optional: true
         - name: ACCESS_SECRET

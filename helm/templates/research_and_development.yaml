@@ -1,57 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.account.name }}
+  name: {{ .Values.rnd.name }}
   namespace: {{ .Values.services.namespace }}
   labels:
-    app: {{ .Values.account.name }}
+    app: {{ .Values.rnd.name }}
   annotations:
     keel.sh/policy: minor # <-- policy name according to https://semver.org/
     keel.sh/trigger: poll # <-- actively query registry, otherwise defaults to webhooks
 spec:
-  replicas: {{ .Values.account.replicas }}
+  replicas: {{ .Values.rnd.replicas }}
   selector:
     matchLabels:
-      app: {{ .Values.account.name }}
+      app: {{ .Values.rnd.name }}
   template:
     metadata:
       labels:
-        app: {{ .Values.account.name }}
+        app: {{ .Values.rnd.name }}
     spec:
       {{- if eq .Values.env "prod" }}
       nodeSelector:
         role: {{ .Values.services.nodeSelector }}
       {{- end }}
       containers:
-      - name: {{ .Values.account.name }}
-        image: "bahamagames/account:{{ .Values.account.version }}"
-        imagePullPolicy: {{ .Values.account.imagePullPolicy }}
+      - name: {{ .Values.rnd.name }}
+        image: "bahamagames/rnd:{{ .Values.rnd.version }}"
+        imagePullPolicy: {{ .Values.rnd.imagePullPolicy }}
         resources:
           requests:
-            cpu: {{ .Values.account.resources.requests.cpu }}
-            memory: {{ .Values.account.resources.requests.memory }}
+            cpu: {{ .Values.rnd.resources.requests.cpu }}
+            memory: {{ .Values.rnd.resources.requests.memory }}
           limits:
-            cpu: {{ .Values.account.resources.limits.cpu }}
-            memory: {{ .Values.account.resources.limits.memory }}
+            cpu: {{ .Values.rnd.resources.limits.cpu }}
+            memory: {{ .Values.rnd.resources.limits.memory }}
         env:
-          - name: HOTBAR_COUNT
-            valueFrom:
-              configMapKeyRef:
-                name: {{.Values.services.namespace}}
-                key:  HOTBAR_COUNT
-                optional: true
-          - name: DEFAULT_PLAYER_LOCATION
-            valueFrom:
-              configMapKeyRef:
-                name: {{.Values.services.namespace}}
-                key:  DEFAULT_PLAYER_LOCATION
-                optional: true
-          - name: ACCESS_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: {{.Values.services.namespace}}
-                key: ACCESS_SECRET
-                optional: true
           - name: REDIS_LOCAL_HOST
             valueFrom:
               configMapKeyRef:

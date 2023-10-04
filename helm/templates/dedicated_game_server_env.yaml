@@ -15,10 +15,6 @@ data:
   REDIS_REMOTE_USER_NAME:                 {{.Values.configMap.data.REDIS_REMOTE_USER_NAME}}
   REDIS_REMOTE_HOST:                      {{.Values.configMap.data.REDIS_REMOTE_HOST}}
   REDIS_REMOTE_PORT:                      '{{.Values.configMap.data.REDIS_REMOTE_PORT}}'
-  {{- if eq .Values.env "dev"}}
-  HOST:                                   {{.Values.dedicatedGameServer.HOST}}
-  PORT:                                   '{{.Values.dedicatedGameServer.PORT}}'
-  {{- end}}
 ---
 
 apiVersion: v1
